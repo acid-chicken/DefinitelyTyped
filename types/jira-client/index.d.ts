@@ -1,16 +1,7 @@
-// Type definitions for jira-client 7.1
-// Project: http://github.com/jira-node/node-jira-client
-// Definitions by: Anatoliy Ostapenko <https://github.com/KOPTE3>
-//                 Orta Therox <https://github.com/orta>
-//                 Robert Kesterson <https://github.com/rkesters>
-//                 Lemeasle Quentin <https://github.com/Worlor>
-// Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
-// TypeScript Version: 2.3
-
 /// <reference types="node" />
 
-import { CoreOptions, RequestResponse } from "request";
 import { ReadStream } from "fs";
+import { CoreOptions, RequestResponse } from "request";
 
 declare class JiraApi {
     private protocol: string;
@@ -39,7 +30,7 @@ declare class JiraApi {
         expand?: string,
         fields?: string,
         properties?: string,
-        fieldsByKeys?: boolean
+        fieldsByKeys?: boolean,
     ): Promise<JiraApi.JsonResponse>;
 
     /**
@@ -100,7 +91,7 @@ declare class JiraApi {
      * Get details about a Sprint
      * @param sprintId - the id for the sprint view
      */
-     getSprint(sprintId: string): Promise<JiraApi.JsonResponse>;
+    getSprint(sprintId: string): Promise<JiraApi.JsonResponse>;
 
     /**
      * Add an issue to the project's current sprint
@@ -176,7 +167,7 @@ declare class JiraApi {
     deleteVersion(
         versionId: string,
         moveFixIssuesToId: string,
-        moveAffectedIssuesToId: string
+        moveAffectedIssuesToId: string,
     ): Promise<JiraApi.JsonResponse>;
 
     /**
@@ -285,7 +276,11 @@ declare class JiraApi {
      * @param issueUpdate - update Object as specified by the rest api
      * @param query - adds parameters to the query string
      */
-    updateIssue(issueId: string, issueUpdate: JiraApi.IssueObject, query?: JiraApi.Query): Promise<JiraApi.JsonResponse>;
+    updateIssue(
+        issueId: string,
+        issueUpdate: JiraApi.IssueObject,
+        query?: JiraApi.Query,
+    ): Promise<JiraApi.JsonResponse>;
 
     /**
      * List Components
@@ -363,7 +358,8 @@ declare class JiraApi {
     upsertFieldOption(
         fieldKey: string,
         optionId: string,
-        option: JiraApi.FieldOptionObject): Promise<JiraApi.JsonResponse>;
+        option: JiraApi.FieldOptionObject,
+    ): Promise<JiraApi.JsonResponse>;
 
     /**
      * Returns an option for a select list issue field.
@@ -456,7 +452,12 @@ declare class JiraApi {
      * @param comment - string containing new comment
      * @param [options={}] - extra options
      */
-    updateComment(issueId: string, commentId: string, comment: string, options?: JiraApi.CommentOptions): Promise<JiraApi.JsonResponse>;
+    updateComment(
+        issueId: string,
+        commentId: string,
+        comment: string,
+        options?: JiraApi.CommentOptions,
+    ): Promise<JiraApi.JsonResponse>;
 
     /**
      * Get Comments by IssueId.
@@ -493,7 +494,7 @@ declare class JiraApi {
         issueId: string,
         worklog: JiraApi.WorklogObject,
         newEstimate?: JiraApi.EstimateObject,
-        options?: JiraApi.WorklogOptions
+        options?: JiraApi.WorklogOptions,
     ): Promise<JiraApi.JsonResponse>;
 
     /**
@@ -526,7 +527,6 @@ declare class JiraApi {
      * [Jira Doc](https://developer.atlassian.com/cloud/jira/platform/rest/v3/#api-rest-api-3-worklog-list-post)
      * @param worklogsIDs - a list of worklog IDs.
      * @param expand - expand to include additional information about worklogs
-     *
      */
     getWorklogs(worklogsIDs: string[], expand: string): Promise<JiraApi.JsonResponse[]>;
 
@@ -537,7 +537,7 @@ declare class JiraApi {
      * @param [startAt=0] - optional starting index number
      * @param [maxResults=1000] - optional ending index number
      */
-    getIssueWorklogs(issueId: string): Promise<JiraApi.JsonResponse>;
+    getIssueWorklogs(issueId: string, startAt?: number, maxResults?: number): Promise<JiraApi.JsonResponse>;
 
     /**
      * List all Issue Types jira knows about
@@ -650,7 +650,7 @@ declare class JiraApi {
         maxResults?: number,
         type?: string,
         name?: string,
-        projectKeyOrId?: string
+        projectKeyOrId?: string,
     ): Promise<JiraApi.JsonResponse>;
 
     /**
@@ -691,7 +691,7 @@ declare class JiraApi {
         maxResults?: number,
         jql?: string,
         validateQuery?: boolean,
-        fields?: string
+        fields?: string,
     ): Promise<JiraApi.JsonResponse>;
 
     /**
@@ -718,7 +718,7 @@ declare class JiraApi {
         maxResults?: number,
         jql?: string,
         validateQuery?: boolean,
-        fields?: string
+        fields?: string,
     ): Promise<JiraApi.JsonResponse>;
 
     /**
@@ -734,7 +734,7 @@ declare class JiraApi {
         boardId: string,
         startAt?: number,
         maxResults?: number,
-        done?: "true" | "false"
+        done?: "true" | "false",
     ): Promise<JiraApi.JsonResponse>;
 
     /**
@@ -757,7 +757,7 @@ declare class JiraApi {
         maxResults?: number,
         jql?: string,
         validateQuery?: boolean,
-        fields?: string
+        fields?: string,
     ): Promise<JiraApi.JsonResponse>;
 
     /**
@@ -840,7 +840,7 @@ declare class JiraApi {
         boardId: string,
         startAt?: number,
         maxResults?: number,
-        state?: "future" | "active" | "closed"
+        state?: "future" | "active" | "closed",
     ): Promise<JiraApi.JsonResponse>;
 
     /**
@@ -854,6 +854,7 @@ declare class JiraApi {
      * @param [validateQuery] - Specifies whether to validate the JQL query or not.
      * Default: true.
      * @param [fields] - The list of fields to return for each issue.
+     * @param [expand] - A comma-separated list of the parameters to expand.
      */
     getBoardIssuesForSprint(
         boardId: string,
@@ -862,7 +863,8 @@ declare class JiraApi {
         maxResults?: number,
         jql?: string,
         validateQuery?: boolean,
-        fields?: string
+        fields?: string,
+        expand?: string,
     ): Promise<JiraApi.JsonResponse>;
 
     /**
@@ -879,7 +881,7 @@ declare class JiraApi {
         boardId: string,
         startAt?: number,
         maxResults?: number,
-        released?: "true" | "false"
+        released?: "true" | "false",
     ): Promise<JiraApi.JsonResponse>;
 
     /**
@@ -916,7 +918,14 @@ declare class JiraApi {
      * Default: true.
      * @param [fields] - The list of fields to return for each issue.
      */
-    getIssuesForEpic(epicId: string, startAt?: number, maxResults?: number, jql?: string, validateQuery?: boolean, fields?: string): Promise<JiraApi.JsonResponse>;
+    getIssuesForEpic(
+        epicId: string,
+        startAt?: number,
+        maxResults?: number,
+        jql?: string,
+        validateQuery?: boolean,
+        fields?: string,
+    ): Promise<JiraApi.JsonResponse>;
 
     /**
      * Move Issues to Epic
@@ -960,7 +969,7 @@ declare class JiraApi {
      * [Jira Doc](https://docs.atlassian.com/jira-software/REST/cloud/2/)
      * @param endpoint - Rest API endpoint
      */
-     genericAgileGet(endpoint: string): Promise<JiraApi.JsonResponse>;
+    genericAgileGet(endpoint: string): Promise<JiraApi.JsonResponse>;
 
     private makeRequestHeader(uri: string, options?: JiraApi.UriOptions);
 
@@ -1059,7 +1068,7 @@ declare namespace JiraApi {
 
     interface BoardObject {
         /** Valid values: scrum, kanban */
-        type: 'scrum' | 'kanban';
+        type: "scrum" | "kanban";
         /** Must be less than 255 characters. */
         name: string;
         /** Id of a filter that the user has permissions to view. */
@@ -1105,7 +1114,7 @@ declare namespace JiraApi {
 
     interface SearchUserOptions {
         /** (DEPRECATED) A query string used to search username, name or e-mail address */
-        username: string;
+        username?: string | undefined;
         /**
          * A query string that is matched against user attributes
          * (displayName, and emailAddress) to find relevant users. The string can match the prefix of

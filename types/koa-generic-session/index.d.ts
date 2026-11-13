@@ -1,17 +1,12 @@
-// Type definitions for koa-generic-session 2.2
-// Project: https://github.com/koajs/generic-session
-// Definitions by: Nick Simmons <https://github.com/nsimmons>, Ragg <https://github.com/Ragg->, Javier Garcia <https://github.com/javiertury>
-// Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
-
-import * as Koa from 'koa';
-import * as Cookies from 'cookies';
+import Cookies = require("cookies");
+import Koa = require("koa");
 
 declare namespace koaSession {
     interface Session {
         cookie: Cookies.SetOption;
     }
 
-    interface SessionIdStore <Ctx = Koa.Context> {
+    interface SessionIdStore<Ctx = Koa.Context> {
         get(this: Ctx): string | undefined;
         set(this: Ctx, sid: string, session: Session): void;
         reset(this: Ctx): void;
@@ -47,8 +42,8 @@ declare namespace koaSession {
     }
 }
 
-declare module 'koa' {
-    interface Context {
+declare module "koa" {
+    interface ExtendableContext {
         sessionId: string;
         session: koaSession.Session | null;
         sessionSave: boolean | null;

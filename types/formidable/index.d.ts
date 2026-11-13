@@ -1,12 +1,6 @@
-// Type definitions for formidable 2.0
-// Project: https://github.com/node-formidable/formidable
-// Definitions by: Wim Looman <https://github.com/Nemo157>
-//                 Martin Badin <https://github.com/martin-badin>
-// Definitions: https://github.com/DefinitelyTyped/DefinitelyTyped
-
 /// <reference types="node" />
 
-import { Stream } from "stream";
+import { Stream, Writable } from "stream";
 import Formidable = require("./Formidable");
 import parsers = require("./parsers/index");
 import PersistentFile = require("./PersistentFile");
@@ -120,11 +114,25 @@ declare namespace formidable {
         minFileSize?: number | undefined;
 
         /**
+         * limit the amount of uploaded files, set Infinity for unlimited
+         *
+         * @default Infinity
+         */
+        maxFiles?: number | undefined;
+
+        /**
          * limit the size of uploaded file
          *
          * @default 200 * 1024 * 1024
          */
         maxFileSize?: number | undefined;
+
+        /**
+         * limit the size of the batch of uploaded files
+         *
+         * @default options.maxFileSize
+         */
+        maxTotalFileSize?: number | undefined;
 
         /**
          * limit the number of fields, set 0 for unlimited
@@ -159,7 +167,7 @@ declare namespace formidable {
          *
          * @default null
          */
-        fileWriteStreamHandler?: (() => void) | undefined;
+        fileWriteStreamHandler?: ((file?: VolatileFile) => Writable) | undefined;
 
         /**
          * when you call the .parse method, the files argument (of the callback) will contain arrays of
@@ -171,34 +179,44 @@ declare namespace formidable {
         multiples?: boolean | undefined;
 
         /**
+         * If true, makes direct folder uploads possible.
+         *
+         * @default false
+         */
+        createDirsFromUploads?: boolean | undefined;
+
+        /**
          * Use it to control newFilename. Must return a string. Will be joined with
          * options.uploadDir.
          *
          * @default undefined
          */
-        filename?: (name: string, ext: string, part: string, form: string) => string | undefined;
+        filename?: (name: string, ext: string, part: Part, form: Formidable) => string;
 
-        enabledPlugins?: string[] | undefined;
+        enabledPlugins?: formidable.PluginFunction[] | undefined;
+
+        filter?: (part: Part) => boolean;
     }
 
-    interface Fields {
-        [field: string]: string | string[];
-    }
-    interface Files {
-        [file: string]: File | File[];
-    }
+    type Fields<T extends string = string> = {
+        readonly [Prop in T]?: string[];
+    };
+    type Files<U extends string = string> = {
+        readonly [Prop in U]?: File[];
+    };
 
     interface Part extends Stream {
-        filename?: string | undefined;
-        headers: Record<string, string>;
-        mime?: string | undefined;
-        name: string;
+        name: string | null;
+        originalFilename: string | null;
+        mimetype: string | null;
     }
 
     /**
      * @link https://github.com/node-formidable/formidable#file
      */
-    interface FileJSON extends Pick<File, "size" | "filepath" | "originalFilename" | "mimetype" | "hash"> {
+    interface FileJSON
+        extends Pick<File, "size" | "filepath" | "originalFilename" | "mimetype" | "hash" | "newFilename">
+    {
         length: number;
         mimetype: string | null;
         mtime: Date | null;
@@ -225,7 +243,7 @@ declare namespace formidable {
         /**
          * Calculated based on options provided
          */
-        newFilename: string | null;
+        newFilename: string;
 
         /**
          * The mime type of this file, according to the uploading client.
@@ -291,6 +309,8 @@ declare namespace formidable {
     type EnabledPlugins = {
         [P in Plugin]: PluginFunction;
     };
+
+    type FormidableError = InstanceType<typeof errors.default>;
 }
 
 declare const formidable: {
@@ -308,6 +328,11 @@ declare const formidable: {
     IncomingForm: typeof Formidable;
     // parsers and mapped parsers
     parsers: typeof parsers;
+    // add named plugin exports
+    octetstream: formidable.PluginFunction;
+    querystring: formidable.PluginFunction;
+    multipart: formidable.PluginFunction;
+    json: formidable.PluginFunction;
 } & formidable.MappedParsers;
 
 export = formidable;
